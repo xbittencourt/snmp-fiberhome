@@ -38,7 +38,7 @@ function isValid(options, slot, pon, onuId, ignore) {
             } else if (slot && pon && onuId) {  // all
                 var ponIndex = ((slot) * 2 ** 25) + ((pon) * 2 ** 19) + ((onuId) * 2 ** 8)
                 snmp_fh.get(options, [OID.getOnuStatus + '.' + ponIndex]).then(ret => {
-                    if (ret[0].value == 1 || ret[0].value == 3)
+                    if (ret[0].value == 1 || ret[0].value == 3 || ret[0].value == 0 || ret[0].value == 1)
                         return resolve(true)
                     if (options.enableWarnings)
                         console.error('Warning! slot ' + slot + ', pon ' + pon + ' or onuId ' + onuId + ' not found')
