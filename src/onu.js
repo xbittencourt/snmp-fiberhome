@@ -425,7 +425,7 @@ function getOnuByIndex(options, onuIndex, toIgnore, ignoreValid) {
                     oids = oids.map(oid => oid + '.' + onuIndex)
                     snmp_fh.get(options, oids).then(data => {
                         olt.getOltModel(options).then(oltData => {
-                            var oltModel = oltData.includes('5116') ? '5116' : oltData.includes('5516') ? '5516' : null
+                            var oltModel = oltData && (oltData.includes('5116') ? '5116' : oltData.includes('5516') ? '5516' : null) || null;
                             var onu = { ..._onu }
                             // Formatando/convertendo os dados
                             data.forEach((o, idx) => {
