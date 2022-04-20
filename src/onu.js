@@ -424,7 +424,7 @@ function getOnuByIndex(options, onuIndex, toIgnore, ignoreValid) {
                     var oids = [OID.getOnuType, OID.getOnuIp, OID.getOnuSystemName, OID.getOnuLogicAuthId, OID.getOnuLogicAuthIdPass, OID.getOnuMacAddress, OID.getOnuStatus, OID.getOnuSoftwareVersion, OID.getOnuHardwareVersion, OID.getOnuFirmwareVersion, OID.getOnuRemoteRestart]
                     oids = oids.map(oid => oid + '.' + onuIndex)
                     snmp_fh.get(options, oids).then(data => {
-                        olt.getOltModel(options).then(oltData => {
+                        const afterGetModel = oltData => {
                             var oltModel = oltData && (oltData.includes('5116') ? '5116' : oltData.includes('5516') ? '5516' : null) || null;
                             var onu = { ..._onu }
                             // Formatando/convertendo os dados
@@ -474,7 +474,8 @@ function getOnuByIndex(options, onuIndex, toIgnore, ignoreValid) {
                                     })
                                 }
                             })
-                        })
+                        }
+                        options.model ? afterGetModel(options.model) : olt.getOltModel(options).then(afterGetModel);
                     })
                 } else return resolve(false)
             }, error => {
