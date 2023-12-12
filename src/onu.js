@@ -419,13 +419,14 @@ function getOnuByIndex(options, onuIndex, toIgnore, ignoreValid) {
     return new Promise((resolve, reject) => {
         try {
             var _onu = parseOnuIndex(onuIndex)
-            gFunc.isValid(options, _onu.slot, _onu.pon, _onu.onuId, ignoreValid).then(isValid => {
+            gFunc.isValid(options, _onu.slot, _onu.pon, _onu.onuId, true).then(isValid => {
                 if (isValid && onuIndex) {
                     var oids = [OID.getOnuType, OID.getOnuIp, OID.getOnuSystemName, OID.getOnuLogicAuthId, OID.getOnuLogicAuthIdPass, OID.getOnuMacAddress, OID.getOnuStatus, OID.getOnuSoftwareVersion, OID.getOnuHardwareVersion, OID.getOnuFirmwareVersion, OID.getOnuRemoteRestart]
                     oids = oids.map(oid => oid + '.' + onuIndex)
                     snmp_fh.get(options, oids).then(data => {
                         const afterGetModel = oltData => {
                             var oltModel = oltData && (oltData.includes('5116') ? '5116' : oltData.includes('5516') ? '5516' : null) || null;
+
                             var onu = { ..._onu }
                             // Formatando/convertendo os dados
                             data.forEach((o, idx) => {
@@ -443,7 +444,7 @@ function getOnuByIndex(options, onuIndex, toIgnore, ignoreValid) {
                                     onu.macAddress = o.value.toString()
                                 else if (o.oid.split('.')[12] == 11) {                  // OID.getOnuStatus
                                     onu.onuStatusValue = o.value
-                                    onu.onuStatus = oltModel == '5116' ? table.onuStatus_5116[o.value] : oltModel == '5516' ? table.onuStatus_5516[o.value] : 'not identified'
+                                    onu.onuStatus = oltModel == '5116' ? table.onuStatus_5116[o.value] : oltModel == '5516' ? table.onuStatus_5516[o.value] : table.onuStatus_5516[o.value]
                                     // TODO: verificar se é NGPON e utilizar: table.onuStatus_5516_NGPON
                                 } else if (o.oid.split('.')[12] == 12 && o.value)       // OID.getOnuSoftwareVersion
                                     onu.softwareVersion = o.value.toString()
